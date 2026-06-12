@@ -24,13 +24,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
 
-
         User existingUser = userRepository.findByEmail(userDto.getEmail());
         if (existingUser != null) {
 
             throw new ConflictException("Пользователь с таким email уже существует");
         }
-
 
         User user = UserMapper.toUser(userDto);
 
@@ -61,7 +59,6 @@ public class UserServiceImpl implements UserService {
             oldUser.setEmail(userDto.getEmail());
         }
 
-
         User updatedUser = userRepository.update(oldUser);
 
         return UserMapper.toUserDto(updatedUser);
@@ -82,7 +79,6 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsers() {
 
         Collection<User> users = userRepository.findAll();
-
 
         return users.stream()
                 .map(UserMapper::toUserDto)

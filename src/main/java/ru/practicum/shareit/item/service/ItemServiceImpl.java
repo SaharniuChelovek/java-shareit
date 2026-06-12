@@ -25,7 +25,6 @@ public class ItemServiceImpl implements ItemService {
         this.userRepository = userRepository;
     }
 
-
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) {
 
@@ -42,7 +41,6 @@ public class ItemServiceImpl implements ItemService {
 
         return ItemMapper.toItemDto(savedItem);
     }
-
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
@@ -63,35 +61,28 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getDescription() != null) {
             oldItem.setDescription(itemDto.getDescription());
         }
-        // Для boolean нужно проверять не null (примитив), поэтому в DTO лучше сделать Boolean available
+
         if (itemDto.getAvailable() != null) {
             oldItem.setAvailable(itemDto.getAvailable());
         }
 
-        // 4. Сохраняем обновленную вещь
+
         Item updatedItem = itemRepository.updateItem(oldItem);
         return ItemMapper.toItemDto(updatedItem);
     }
 
-
     @Override
     public ItemDto getItemById(Long userId, Long itemId) {
 
-        // 1. Проверяем, что пользователь, делающий запрос, существует
-        // (Если кто-то шлет левый ID в заголовке, мы не дадим ему смотреть вещи)
         if (userRepository.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь не найден");
         }
 
-        // 2. Ищем саму вещь по itemId
         Item item = itemRepository.getItemById(itemId);
         if (item == null) {
             throw new NotFoundException("Вещь не найдена");
         }
 
-        // 3. Проверку на владельца НЕ делаем! Любой может смотреть.
-
-        // 4. Возвращаем DTO
         return ItemMapper.toItemDto(item);
     }
 
@@ -113,7 +104,6 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
         }
-
 
         return itemRepository.search(text).stream()
                 .map(ItemMapper::toItemDto)

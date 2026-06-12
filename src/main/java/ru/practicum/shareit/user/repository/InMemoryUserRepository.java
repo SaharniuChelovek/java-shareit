@@ -26,14 +26,12 @@ public class InMemoryUserRepository implements UserRepository {
     public User create(User user) {
         log.info("Создается пользователь {}", user);
 
-
         user.setId(getNextId());
 
         users.put(user.getId(), user);
         log.info("Пользователь {} успешно создан", user);
         return user;
     }
-
 
     @Override
     public User update(User user) {
@@ -76,8 +74,5 @@ public class InMemoryUserRepository implements UserRepository {
                 .orElse(0);
         return ++currentMaxId;
     }
-
-
-
 
 }
