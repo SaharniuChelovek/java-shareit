@@ -40,7 +40,6 @@ public class ErrorHandler {
         return new ErrorResponse(errorMessage);
     }
 
-
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(ConflictException e) {

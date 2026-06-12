@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.practicum.shareit.user.User;
 
