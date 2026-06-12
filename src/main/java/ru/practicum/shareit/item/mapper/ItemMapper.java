@@ -20,7 +20,7 @@ public class ItemMapper {
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.isAvailable(),
+                itemDto.getAvailable(),
                 null, //у dto нет доступа к владельцу, поэтому тут пусто
                 null
                 //dto не может из requestId слепить сам request, так что null

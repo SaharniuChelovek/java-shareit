@@ -75,12 +75,23 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public ItemDto getItemById(Long itemId) {
+    public ItemDto getItemById(Long userId, Long itemId) {
 
-        if (itemRepository.getItemById(itemId) == null) {
-            throw new NotFoundException("");
+        // 1. Проверяем, что пользователь, делающий запрос, существует
+        // (Если кто-то шлет левый ID в заголовке, мы не дадим ему смотреть вещи)
+        if (userRepository.getUserById(userId) == null) {
+            throw new NotFoundException("Пользователь не найден");
         }
+
+        // 2. Ищем саму вещь по itemId
         Item item = itemRepository.getItemById(itemId);
+        if (item == null) {
+            throw new NotFoundException("Вещь не найдена");
+        }
+
+        // 3. Проверку на владельца НЕ делаем! Любой может смотреть.
+
+        // 4. Возвращаем DTO
         return ItemMapper.toItemDto(item);
     }
 
