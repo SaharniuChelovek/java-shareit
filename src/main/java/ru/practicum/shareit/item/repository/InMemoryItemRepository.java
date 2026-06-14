@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -23,7 +23,7 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public Item createItem(Item item) {
 
-        log.info("{}", item.getId());
+        log.info("Создание предмета {}", item.getId());
 
         item.setId(getNextId());
 
@@ -35,7 +35,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Item updateItem(Item item) {
-        log.info("{}", item.getId());
+        log.info("Обновление предмета {}", item.getId());
 
         items.put(item.getId(), item);
         log.info("{}", item.getId());
@@ -44,10 +44,10 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item getItemById(Long id) {
-        log.info("{}", id);
+    public Optional<Item> getItemById(Long id) {
+        log.info("Получение вещи по id {}", id);
 
-        return items.get(id);
+        return Optional.ofNullable(items.get(id));
     }
 
     @Override
@@ -60,10 +60,6 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Collection<Item> search(String text) {
-
-        if (text == null || text.isBlank()) {
-            return Collections.emptyList();
-        }
 
         String lowerText = text.toLowerCase();
         return items.values().stream()

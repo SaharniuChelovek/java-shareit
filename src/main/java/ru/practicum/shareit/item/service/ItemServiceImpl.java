@@ -28,10 +28,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) {
 
-        User owner = userRepository.getUserById(userId);
-        if (owner == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        User owner = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         Item item = ItemMapper.toItem(itemDto);
 
@@ -45,10 +43,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
 
-        Item oldItem = itemRepository.getItemById(itemId);
-        if (oldItem == null) {
-            throw new NotFoundException("Вещь не найдена");
-        }
+        Item oldItem = itemRepository.getItemById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (!oldItem.getOwner().getId().equals(userId)) {
 
@@ -74,11 +70,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemById(Long userId, Long itemId) {
 
-        if (userRepository.getUserById(userId) == null) {
+        if (userRepository.getUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
 
-        Item item = itemRepository.getItemById(itemId);
+        Item item = itemRepository.getItemById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
         if (item == null) {
             throw new NotFoundException("Вещь не найдена");
         }
@@ -89,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemsByOwner(Long userId) {
 
-        if (userRepository.getUserById(userId) == null) {
+        if (userRepository.getUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
 
@@ -104,6 +101,7 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
         }
+
 
         return itemRepository.search(text).stream()
                 .map(ItemMapper::toItemDto)

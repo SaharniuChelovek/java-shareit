@@ -40,10 +40,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
 
-        User oldUser = userRepository.getUserById(userId);
-        if (oldUser == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        User oldUser = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         if (userDto.getEmail() != null) {
             User existingUser = userRepository.findByEmail(userDto.getEmail());
@@ -67,11 +65,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUser(Long userId) {
 
-        User user = userRepository.getUserById(userId);
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
         return UserMapper.toUserDto(user);
     }
 
@@ -87,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        if (userRepository.getUserById(userId) == null) {
+        if (userRepository.getUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
         userRepository.delete(userId);

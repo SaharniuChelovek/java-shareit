@@ -4,6 +4,7 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemRepository {
 
@@ -11,7 +12,7 @@ public interface ItemRepository {
 
     Item updateItem(Item item);
 
-    Item getItemById(Long id);
+    Optional<Item> getItemById(Long id);
 
     List<Item> findAllByOwnerId(Long ownerId);
 

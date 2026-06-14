@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -43,10 +44,11 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public Optional<User> getUserById(Long id) {
+
         log.info("Получение пользователя по id {}", id);
 
-        return users.get(id);
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
