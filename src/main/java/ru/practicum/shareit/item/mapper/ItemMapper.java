@@ -33,7 +33,6 @@ public class ItemMapper {
 
         Long ownerId = item.getOwner() != null ? item.getOwner().getId() : null;
 
-
         Long requestId = item.getRequest() != null ? item.getRequest().getId() : null;
 
         return new ItemDto(

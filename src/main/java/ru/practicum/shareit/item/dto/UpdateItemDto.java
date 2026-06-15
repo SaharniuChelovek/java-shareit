@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class UpdateItemDto {
 
     private String name;
+
     private String description;
+
     private Boolean available;
 }
