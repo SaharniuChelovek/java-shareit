@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.error.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,7 +53,7 @@ class ItemServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Ударная дрель", result.get(0).getName());
+        assertEquals("Ударная дрель", result.getFirst().getName());
 
         verify(itemRepository, times(1)).search(searchText);
     }
@@ -87,11 +89,11 @@ class ItemServiceImplTest {
     void createItemWhenUserDoesNotExist() {
 
         Long fakeUserId = 999L;
-        ItemDto itemDto = new ItemDto(null, "Молоток", "Хороший молоток", true, null);
+        CreateItemDto createItemDto = new CreateItemDto("Молоток", "Хороший молоток", true, null);
 
-        when(userRepository.getUserById(fakeUserId)).thenReturn(null);
+        when(userRepository.getUserById(fakeUserId)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> itemService.createItem(fakeUserId, itemDto));
+        assertThrows(NotFoundException.class, () -> itemService.createItem(fakeUserId, createItemDto));
 
         verify(itemRepository, never()).createItem(any(Item.class));
     }
@@ -101,17 +103,17 @@ class ItemServiceImplTest {
 
         Long userId = 1L;
         User owner = new User(userId, "Owner", "owner@mail.ru");
-        ItemDto incomeDto = new ItemDto(null, "Молоток", "Хороший молоток", true, null);
+        CreateItemDto createItemDto = new CreateItemDto("Молоток", "Хороший молоток", true, null);
 
-        Item itemWithoutOwner = ItemMapper.toItem(incomeDto);
+        Item itemWithoutOwner = ItemMapper.toItem(createItemDto);
 
         Item savedItem = new Item(1L, "Молоток", "Хороший молоток", true, owner, null);
 
-        when(userRepository.getUserById(userId)).thenReturn(owner);
+        when(userRepository.getUserById(userId)).thenReturn(Optional.of(owner));
         when(itemRepository.createItem(any(Item.class))).thenReturn(savedItem);
 
 
-        ItemDto result = itemService.createItem(userId, incomeDto);
+        ItemDto result = itemService.createItem(userId, createItemDto);
 
 
         assertNotNull(result);
