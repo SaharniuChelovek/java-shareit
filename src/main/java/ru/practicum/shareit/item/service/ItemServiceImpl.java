@@ -2,7 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -26,12 +28,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    public ItemDto createItem(Long userId, CreateItemDto createItemDto) {
 
         User owner = userRepository.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-        Item item = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(createItemDto);
 
         item.setOwner(owner);
 
@@ -41,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemDto updateItem(Long userId, Long itemId, UpdateItemDto updateItemDto) {
 
         Item oldItem = itemRepository.getItemById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
@@ -51,19 +53,10 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Редактировать вещь может только владелец");
         }
 
-        if (itemDto.getName() != null) {
-            oldItem.setName(itemDto.getName());
-        }
-        if (itemDto.getDescription() != null) {
-            oldItem.setDescription(itemDto.getDescription());
-        }
-
-        if (itemDto.getAvailable() != null) {
-            oldItem.setAvailable(itemDto.getAvailable());
-        }
-
+        ItemMapper.updateItemFromDto(updateItemDto, oldItem);
 
         Item updatedItem = itemRepository.updateItem(oldItem);
+
         return ItemMapper.toItemDto(updatedItem);
     }
 
