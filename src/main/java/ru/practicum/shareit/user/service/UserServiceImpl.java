@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.exception.ConflictException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.CreateUserDto;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -22,15 +24,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(CreateUserDto createUserDto) {
 
-        User existingUser = userRepository.findByEmail(userDto.getEmail());
+        User existingUser = userRepository.findByEmail(createUserDto.getEmail());
         if (existingUser != null) {
 
             throw new ConflictException("Пользователь с таким email уже существует");
         }
 
-        User user = UserMapper.toUser(userDto);
+        User user = UserMapper.toUser(createUserDto);
 
         User savedUser = userRepository.create(user);
 
@@ -38,24 +40,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) {
+    public UserDto updateUser(Long userId, UpdateUserDto updateUserDto) {
 
         User oldUser = userRepository.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-        if (userDto.getEmail() != null) {
-            User existingUser = userRepository.findByEmail(userDto.getEmail());
+        if (updateUserDto.getEmail() != null) {
+            User existingUser = userRepository.findByEmail(updateUserDto.getEmail());
             if (existingUser != null && !existingUser.getId().equals(userId)) {
                 throw new ConflictException("Этот email уже занят");
             }
         }
 
-        if (userDto.getName() != null) {
-            oldUser.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            oldUser.setEmail(userDto.getEmail());
-        }
+        UserMapper.updateUserFromDto(updateUserDto, oldUser);
 
         User updatedUser = userRepository.update(oldUser);
 
