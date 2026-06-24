@@ -1,23 +1,22 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import ru.practicum.shareit.user.User;
 
-import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
+
+
+@Entity
+@Table(name = "item_requests")
 @Data
 public class ItemRequest {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    private String description;
-
-    private User requestor;
-
-    private LocalDateTime created;
+    //пока что класс является заглушкой, чтоб все работало как надо
 }
