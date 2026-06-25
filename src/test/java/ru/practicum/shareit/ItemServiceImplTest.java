@@ -11,9 +11,11 @@ import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.repository.UserDbRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import static org.mockito.Mockito.when;
@@ -29,10 +31,10 @@ import static org.mockito.Mockito.*;
 class ItemServiceImplTest {
 
     @Mock
-    private ItemRepository itemRepository;
+    private ItemDbRepository itemRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserDbRepository userRepository;
 
     @InjectMocks
     private ItemServiceImpl itemService;
@@ -91,11 +93,11 @@ class ItemServiceImplTest {
         Long fakeUserId = 999L;
         CreateItemDto createItemDto = new CreateItemDto("Молоток", "Хороший молоток", true, null);
 
-        when(userRepository.getUserById(fakeUserId)).thenReturn(Optional.empty());
+        when(userRepository.findById(fakeUserId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> itemService.createItem(fakeUserId, createItemDto));
 
-        verify(itemRepository, never()).createItem(any(Item.class));
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
@@ -109,8 +111,8 @@ class ItemServiceImplTest {
 
         Item savedItem = new Item(1L, "Молоток", "Хороший молоток", true, owner, null);
 
-        when(userRepository.getUserById(userId)).thenReturn(Optional.of(owner));
-        when(itemRepository.createItem(any(Item.class))).thenReturn(savedItem);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
+        when(itemRepository.save(any(Item.class))).thenReturn(savedItem);
 
 
         ItemDto result = itemService.createItem(userId, createItemDto);

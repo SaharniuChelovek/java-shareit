@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.CreateUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.repository.UserDbRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserDbRepository userRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -39,7 +40,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByEmail("ivan@mail.ru")).thenReturn(null);
 
-        when(userRepository.create(any(User.class))).thenReturn(savedUser);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         UserDto result = userService.createUser(createDto);
 
@@ -47,7 +48,7 @@ class UserServiceImplTest {
         assertEquals(1L, result.getId());
         assertEquals("ivan@mail.ru", result.getEmail());
 
-        verify(userRepository, times(1)).create(any(User.class));
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
@@ -60,7 +61,7 @@ class UserServiceImplTest {
 
         assertThrows(ConflictException.class, () -> userService.createUser(updateUserDto));
 
-        verify(userRepository, never()).create(any(User.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -69,7 +70,7 @@ class UserServiceImplTest {
         Long userId = 999L;
         UpdateUserDto updateUserDto = new UpdateUserDto("NewName", "new@mail.ru");
 
-        when(userRepository.getUserById(userId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> userService.updateUser(userId, updateUserDto));
     }

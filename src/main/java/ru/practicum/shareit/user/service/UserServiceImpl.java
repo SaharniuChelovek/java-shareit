@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.dto.CreateUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.repository.UserDbRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
@@ -17,9 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserDbRepository userRepository;
 
-    public UserServiceImpl(final UserRepository userRepository) {
+    public UserServiceImpl(final UserDbRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
         User user = UserMapper.toUser(createUserDto);
 
-        User savedUser = userRepository.create(user);
+        User savedUser = userRepository.save(user);
 
         return UserMapper.toUserDto(savedUser);
     }
@@ -42,8 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long userId, UpdateUserDto updateUserDto) {
 
-        User oldUser = userRepository.getUserById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User oldUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         if (updateUserDto.getEmail() != null) {
             User existingUser = userRepository.findByEmail(updateUserDto.getEmail());
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
         UserMapper.updateUserFromDto(updateUserDto, oldUser);
 
-        User updatedUser = userRepository.update(oldUser);
+        User updatedUser = userRepository.save(oldUser);
 
         return UserMapper.toUserDto(updatedUser);
     }
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUser(Long userId) {
 
-        User user = userRepository.getUserById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         return UserMapper.toUserDto(user);
@@ -80,9 +80,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        if (userRepository.getUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 }

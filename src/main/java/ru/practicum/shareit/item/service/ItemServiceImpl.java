@@ -7,8 +7,9 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.repository.UserDbRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collections;
@@ -19,25 +20,25 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final ItemDbRepository itemDbRepository;
+    private final UserDbRepository userRepository;
 
-    public ItemServiceImpl(final ItemRepository itemRepository, final UserRepository userRepository) {
-        this.itemRepository = itemRepository;
+    public ItemServiceImpl(final ItemDbRepository itemRepository, final UserDbRepository userRepository) {
+        this.itemDbRepository = itemRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     public ItemDto createItem(Long userId, CreateItemDto createItemDto) {
 
-        User owner = userRepository.getUserById(userId)
+        User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         Item item = ItemMapper.toItem(createItemDto);
 
         item.setOwner(owner);
 
-        Item savedItem = itemRepository.createItem(item);
+        Item savedItem = itemDbRepository.save(item);
 
         return ItemMapper.toItemDto(savedItem);
     }
@@ -45,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long userId, Long itemId, UpdateItemDto updateItemDto) {
 
-        Item oldItem = itemRepository.getItemById(itemId)
+        Item oldItem = itemDbRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (!oldItem.getOwner().getId().equals(userId)) {
@@ -55,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
 
         ItemMapper.updateItemFromDto(updateItemDto, oldItem);
 
-        Item updatedItem = itemRepository.updateItem(oldItem);
+        Item updatedItem = itemDbRepository.save(oldItem);
 
         return ItemMapper.toItemDto(updatedItem);
     }
@@ -63,11 +64,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemById(Long userId, Long itemId) {
 
-        if (userRepository.getUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
 
-        Item item = itemRepository.getItemById(itemId)
+        Item item = itemDbRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
         if (item == null) {
             throw new NotFoundException("Вещь не найдена");
@@ -79,11 +80,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemsByOwner(Long userId) {
 
-        if (userRepository.getUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
 
-        return itemRepository.findAllByOwnerId(userId).stream()
+        return itemDbRepository.findAllByOwnerId(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -96,7 +97,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
 
-        return itemRepository.search(text).stream()
+        return itemDbRepository.search(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
