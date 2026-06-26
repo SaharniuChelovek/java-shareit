@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserDbRepository;
-import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
