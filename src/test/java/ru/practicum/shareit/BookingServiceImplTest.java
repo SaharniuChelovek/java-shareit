@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
+import ru.practicum.shareit.error.exception.ForbiddenException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.error.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -132,7 +133,7 @@ class BookingServiceImplTest {
     void approveBookingWhenUserIsNotOwner() {
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
 
-        assertThrows(NotFoundException.class,
+        assertThrows(ForbiddenException.class,
                 () -> bookingService.approveBooking(booker.getId(), booking.getId(), true));
     }
 

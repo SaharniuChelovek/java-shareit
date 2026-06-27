@@ -8,8 +8,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 
-
-
 @Entity
 @Table(name = "item_requests")
 @Data

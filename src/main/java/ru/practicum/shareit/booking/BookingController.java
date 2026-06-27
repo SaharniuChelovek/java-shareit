@@ -26,14 +26,12 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    // POST /bookings
     @PostMapping
     public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long bookerId,
                                     @RequestBody CreateBookingDto createBookingDto) {
         return bookingService.createBooking(bookerId, createBookingDto);
     }
 
-    // PATCH /bookings/{bookingId}?approved={approved}
     @PatchMapping("/{bookingId}")
     public BookingDto approveBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @PathVariable Long bookingId,
@@ -41,21 +39,18 @@ public class BookingController {
         return bookingService.approveBooking(userId, bookingId, approved);
     }
 
-    // GET /bookings/{bookingId}
     @GetMapping("/{bookingId}")
     public BookingDto getBookingById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @PathVariable Long bookingId) {
         return bookingService.getBookingById(userId, bookingId);
     }
 
-    // GET /bookings?state={state}
     @GetMapping
     public List<BookingDto> getBookings(@RequestHeader("X-Sharer-User-Id") Long bookerId,
                                         @RequestParam(defaultValue = "ALL") BookingState state) {
         return bookingService.getBookings(bookerId, state);
     }
 
-    // GET /bookings/owner?state={state}
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                              @RequestParam(defaultValue = "ALL") BookingState state) {

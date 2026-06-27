@@ -5,6 +5,8 @@ import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.ArrayList;
+
 public class ItemMapper {
 
     public static Item toItem(CreateItemDto dto) {
@@ -30,9 +32,7 @@ public class ItemMapper {
     }
 
     public static ItemDto toItemDto(Item item) {
-
         Long ownerId = item.getOwner() != null ? item.getOwner().getId() : null;
-
         Long requestId = item.getRequest() != null ? item.getRequest().getId() : null;
 
         return new ItemDto(
@@ -41,7 +41,10 @@ public class ItemMapper {
                 item.getDescription(),
                 item.isAvailable(),
                 ownerId,
-                requestId
+                requestId,
+                null,        // lastBooking — заполняется в сервисе
+                null,        // nextBooking — заполняется в сервисе
+                new ArrayList<>()  // comments — пустой список по умолчанию
         );
     }
 }
