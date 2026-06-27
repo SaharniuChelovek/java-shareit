@@ -4,13 +4,14 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
 
-/**
- * TODO Sprint add-controllers.
- */
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
 
     private Long id;
@@ -24,4 +25,10 @@ public class ItemDto {
     private Long ownerId;
 
     private Long requestId;
+
+    private LocalDateTime lastBooking;
+
+    private LocalDateTime nextBooking;
+
+    private List<CommentDto> comments;
 }
