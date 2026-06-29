@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -8,6 +9,7 @@ import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.error.exception.ConflictException;
 import ru.practicum.shareit.error.exception.ForbiddenException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.error.exception.ValidationException;
@@ -19,21 +21,13 @@ import ru.practicum.shareit.user.repository.UserDbRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
+@AllArgsConstructor
 @Service
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final ItemDbRepository itemRepository;
     private final UserDbRepository userRepository;
-
-    public BookingServiceImpl(BookingRepository bookingRepository,
-                              ItemDbRepository itemRepository,
-                              UserDbRepository userRepository) {
-        this.bookingRepository = bookingRepository;
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public BookingDto createBooking(Long bookerId, CreateBookingDto createBookingDto) {
@@ -46,6 +40,12 @@ public class BookingServiceImpl implements BookingService {
 
         if (!item.isAvailable()) {
             throw new ValidationException("Вещь недоступна для бронирования");
+        }
+
+        if (bookingRepository.existsByItemIdAndStatusAndStartDateBeforeAndEndDateAfter(
+                item.getId(), BookingStatus.APPROVED,
+                createBookingDto.getEndDate(), createBookingDto.getStartDate())) {
+            throw new ConflictException("Вещь уже забронирована на этот период");
         }
 
         Booking booking = BookingMapper.toBooking(createBookingDto);

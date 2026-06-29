@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.repository.UserDbRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -114,14 +115,20 @@ public class ItemServiceImpl implements ItemService {
         List<Long> itemIds = items.stream().map(Item::getId).toList();
         LocalDateTime now = LocalDateTime.now();
 
-        // достаём бронирования и комментарии одним запросом для всех вещей
-        List<Booking> lastBookings = bookingRepository
-                .findAllByItemIdInAndStatusAndEndDateBeforeOrderByEndDateDesc(
-                        itemIds, BookingStatus.APPROVED, now);
+        // достаём все бронирования одним запросом
+        List<Booking> allBookings = bookingRepository
+                .findAllByItemIdInAndStatus(itemIds, BookingStatus.APPROVED);
 
-        List<Booking> nextBookings = bookingRepository
-                .findAllByItemIdInAndStatusAndStartDateAfterOrderByStartDateAsc(
-                        itemIds, BookingStatus.APPROVED, now);
+        // фильтруем и сортируем уже в памяти
+        List<Booking> lastBookings = allBookings.stream()
+                .filter(b -> b.getEndDate().isBefore(now))
+                .sorted(Comparator.comparing(Booking::getEndDate).reversed())
+                .toList();
+
+        List<Booking> nextBookings = allBookings.stream()
+                .filter(b -> b.getStartDate().isAfter(now))
+                .sorted(Comparator.comparing(Booking::getStartDate))
+                .toList();
 
         List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
 
