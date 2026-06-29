@@ -2,31 +2,26 @@ package ru.practicum.shareit.booking.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.enums.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
+@NoArgsConstructor
+public class CreateBookingDto {
 
-    private Long id;
-
+    @NotNull(message = "Дата начала не может быть пустой")
     @JsonProperty("start")
     private LocalDateTime startDate;
 
+    @NotNull(message = "Дата окончания не может быть пустой")
     @JsonProperty("end")
     private LocalDateTime endDate;
 
-    private ItemDto item;
-
-    private UserDto booker;
-
-    private BookingStatus status;
+    @NotNull(message = "Вещь не может быть пустой")
+    private Long itemId;
 }
