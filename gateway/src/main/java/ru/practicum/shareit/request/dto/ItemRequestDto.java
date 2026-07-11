@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request.dto;
 
 
-import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +13,8 @@ public class ItemRequestDto {
 
     private String description;
 
-    private User requestor;
+    //пока пусть будет string потом перепишем(тут был User)
+    private String requestor;
 
     private LocalDateTime created;
 
