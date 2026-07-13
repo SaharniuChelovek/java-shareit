@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -17,6 +18,8 @@ import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemDbRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserDbRepository;
 
@@ -27,22 +30,15 @@ import java.util.List;
 
 
 @Service
+@AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
     private final ItemDbRepository itemRepository;
     private final UserDbRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
-    public ItemServiceImpl(ItemDbRepository itemRepository,
-                           UserDbRepository userRepository,
-                           BookingRepository bookingRepository,
-                           CommentRepository commentRepository) {
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-        this.bookingRepository = bookingRepository;
-        this.commentRepository = commentRepository;
-    }
 
     @Override
     public ItemDto createItem(Long userId, CreateItemDto createItemDto) {
@@ -51,6 +47,12 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = ItemMapper.toItem(createItemDto);
         item.setOwner(owner);
+
+        if (createItemDto.getRequestId() != null) {
+            ItemRequest request = itemRequestRepository.findById(createItemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос не найден"));
+            item.setRequest(request);
+        }
 
         Item savedItem = itemRepository.save(item);
         return ItemMapper.toItemDto(savedItem);
@@ -82,14 +84,12 @@ public class ItemServiceImpl implements ItemService {
 
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        // комментарии добавляем всегда
         List<CommentDto> comments = commentRepository.findAllByItemId(itemId)
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .toList();
         itemDto.setComments(comments);
 
-        // даты бронирования только для владельца
         if (item.getOwner().getId().equals(userId)) {
             LocalDateTime now = LocalDateTime.now();
 
