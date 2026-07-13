@@ -26,7 +26,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemDbRepository itemRepository;
 
 
-
     @Override
     public ItemRequestDto createRequest(Long userId, CreateItemRequestDto createItemRequestDto) {
         User requestor = userRepository.findById(userId)
