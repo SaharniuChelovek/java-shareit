@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.client.ItemClient;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.CreateItemDto;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -36,14 +33,14 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @PathVariable Long itemId,
-                          @RequestBody UpdateItemDto updateItemDto) {
+                                         @PathVariable Long itemId,
+                                         @RequestBody UpdateItemDto updateItemDto) {
         return itemClient.updateItem(userId, itemId, updateItemDto);
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                               @PathVariable Long itemId) {
+                                              @PathVariable Long itemId) {
         return itemClient.getItemById(userId, itemId);
     }
 
@@ -59,8 +56,8 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @PathVariable Long itemId,
-                                 @Valid  @RequestBody CreateCommentDto createCommentDto) {
+                                             @PathVariable Long itemId,
+                                             @Valid @RequestBody CreateCommentDto createCommentDto) {
         return itemClient.addComment(userId, itemId, createCommentDto);
     }
 }
