@@ -139,4 +139,24 @@ class BookingControllerGatewayTest {
                         .param("state", "ALL"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void getBookings_withPastState_shouldReturn200() throws Exception {
+        when(bookingClient.getBookings(anyLong(), any())).thenReturn(ResponseEntity.ok().build());
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "PAST"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getBookings_withCurrentState_shouldReturn200() throws Exception {
+        when(bookingClient.getBookings(anyLong(), any())).thenReturn(ResponseEntity.ok().build());
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "CURRENT"))
+                .andExpect(status().isOk());
+    }
 }
