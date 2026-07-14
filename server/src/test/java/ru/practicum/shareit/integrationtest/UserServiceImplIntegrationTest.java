@@ -1,12 +1,12 @@
 package ru.practicum.shareit.integrationtest;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.repository.UserDbRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
@@ -22,12 +22,13 @@ class UserServiceImplIntegrationTest {
     private UserService userService;
 
     @Autowired
-    private UserDbRepository userRepository;
+    private EntityManager entityManager;
 
     @Test
     void getAllUsers_shouldReturnAllUsers() {
-        userRepository.save(new User(null, "User1", "user1@mail.ru"));
-        userRepository.save(new User(null, "User2", "user2@mail.ru"));
+        entityManager.persist(new User(null, "User1", "user1@mail.ru"));
+        entityManager.persist(new User(null, "User2", "user2@mail.ru"));
+        entityManager.flush();
 
         List<UserDto> result = userService.getAllUsers();
 

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,7 @@ public class ItemRequestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemRequestDto createRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                        @Valid @RequestBody CreateItemRequestDto createItemRequestDto) {
+                                        @RequestBody CreateItemRequestDto createItemRequestDto) {
         return itemRequestService.createRequest(userId, createItemRequestDto);
     }
 

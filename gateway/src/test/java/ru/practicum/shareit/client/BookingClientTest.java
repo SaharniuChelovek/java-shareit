@@ -1,4 +1,4 @@
-package ru.practicum.shareit.baseclienttest;
+package ru.practicum.shareit.client;
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.MockRestServiceServer;
 import ru.practicum.shareit.booking.dto.CreateBookingDto;
 import ru.practicum.shareit.booking.enums.BookingState;
-import ru.practicum.shareit.client.BookingClient;
 
 import java.time.LocalDateTime;
 

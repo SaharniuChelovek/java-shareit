@@ -1,19 +1,17 @@
 package ru.practicum.shareit.integrationtest;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.repository.UserDbRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,21 +28,20 @@ class ItemRequestServiceImplIntegrationTest {
     private ItemRequestService itemRequestService;
 
     @Autowired
-    private UserDbRepository userRepository;
-
-    @Autowired
-    private ItemDbRepository itemRepository;
-
-    @Autowired
-    private ItemRequestRepository itemRequestRepository;
+    private EntityManager entityManager;
 
     private User requestor;
     private User owner;
 
     @BeforeEach
     void setUp() {
-        requestor = userRepository.save(new User(null, "Requestor", "requestor@mail.com"));
-        owner = userRepository.save(new User(null, "Owner", "owner@mail.com"));
+        requestor = new User(null, "Requestor", "requestor@mail.com");
+        entityManager.persist(requestor);
+
+        owner = new User(null, "Owner", "owner@mail.com");
+        entityManager.persist(owner);
+
+        entityManager.flush();
     }
 
     @Test
@@ -61,11 +58,13 @@ class ItemRequestServiceImplIntegrationTest {
 
     @Test
     void getOwnRequests_shouldReturnRequestsWithItems() {
-        ItemRequest request = itemRequestRepository.save(new ItemRequest(
-                null, "Нужна дрель", requestor, LocalDateTime.now()
-        ));
+        ItemRequest request = new ItemRequest(null, "Нужна дрель", requestor, LocalDateTime.now());
+        entityManager.persist(request);
 
-        itemRepository.save(new Item(null, "Дрель", "Мощная дрель", true, owner, request));
+        Item item = new Item(null, "Дрель", "Мощная дрель", true, owner, request);
+        entityManager.persist(item);
+
+        entityManager.flush();
 
         List<ItemRequestDto> result = itemRequestService.getOwnRequests(requestor.getId());
 
@@ -78,9 +77,9 @@ class ItemRequestServiceImplIntegrationTest {
 
     @Test
     void getAllRequests_shouldReturnOtherUsersRequests() {
-        itemRequestRepository.save(new ItemRequest(
-                null, "Нужна дрель", requestor, LocalDateTime.now()
-        ));
+        ItemRequest request = new ItemRequest(null, "Нужна дрель", requestor, LocalDateTime.now());
+        entityManager.persist(request);
+        entityManager.flush();
 
         List<ItemRequestDto> result = itemRequestService.getAllRequests(owner.getId());
 
@@ -91,9 +90,9 @@ class ItemRequestServiceImplIntegrationTest {
 
     @Test
     void getAllRequests_shouldNotReturnOwnRequests() {
-        itemRequestRepository.save(new ItemRequest(
-                null, "Нужна дрель", requestor, LocalDateTime.now()
-        ));
+        ItemRequest request = new ItemRequest(null, "Нужна дрель", requestor, LocalDateTime.now());
+        entityManager.persist(request);
+        entityManager.flush();
 
         List<ItemRequestDto> result = itemRequestService.getAllRequests(requestor.getId());
 
@@ -103,11 +102,13 @@ class ItemRequestServiceImplIntegrationTest {
 
     @Test
     void getRequestById_shouldReturnRequestWithItems() {
-        ItemRequest request = itemRequestRepository.save(new ItemRequest(
-                null, "Нужна дрель", requestor, LocalDateTime.now()
-        ));
+        ItemRequest request = new ItemRequest(null, "Нужна дрель", requestor, LocalDateTime.now());
+        entityManager.persist(request);
 
-        itemRepository.save(new Item(null, "Дрель", "Мощная дрель", true, owner, request));
+        Item item = new Item(null, "Дрель", "Мощная дрель", true, owner, request);
+        entityManager.persist(item);
+
+        entityManager.flush();
 
         ItemRequestDto result = itemRequestService.getRequestById(owner.getId(), request.getId());
 

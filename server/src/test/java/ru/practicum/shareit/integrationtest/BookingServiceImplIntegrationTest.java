@@ -1,5 +1,6 @@
 package ru.practicum.shareit.integrationtest;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,9 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.enums.BookingStatus;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.repository.UserDbRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,13 +28,7 @@ class BookingServiceImplIntegrationTest {
     private BookingService bookingService;
 
     @Autowired
-    private UserDbRepository userRepository;
-
-    @Autowired
-    private ItemDbRepository itemRepository;
-
-    @Autowired
-    private BookingRepository bookingRepository;
+    private EntityManager entityManager;
 
     private User owner;
     private User booker;
@@ -44,21 +36,28 @@ class BookingServiceImplIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        owner = userRepository.save(new User(null, "Owner", "owner@mail.ru"));
-        booker = userRepository.save(new User(null, "Booker", "booker@mail.ru"));
-        item = itemRepository.save(new Item(null, "Дрель", "Мощная дрель", true, owner, null));
+        owner = new User(null, "Owner", "owner@mail.ru");
+        entityManager.persist(owner);
+
+        booker = new User(null, "Booker", "booker@mail.ru");
+        entityManager.persist(booker);
+
+        item = new Item(null, "Дрель", "Мощная дрель", true, owner, null);
+        entityManager.persist(item);
+
+        entityManager.flush();
     }
 
     @Test
     void getBookings_shouldReturnAllBookings() {
-        bookingRepository.save(new Booking(
+        Booking booking = new Booking(
                 null,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(3),
-                item,
-                booker,
-                BookingStatus.WAITING
-        ));
+                item, booker, BookingStatus.WAITING
+        );
+        entityManager.persist(booking);
+        entityManager.flush();
 
         List<BookingDto> result = bookingService.getBookings(booker.getId(), BookingState.ALL);
 
@@ -68,14 +67,14 @@ class BookingServiceImplIntegrationTest {
 
     @Test
     void getBookings_shouldReturnPastBookings() {
-        bookingRepository.save(new Booking(
+        Booking booking = new Booking(
                 null,
                 LocalDateTime.now().minusDays(3),
                 LocalDateTime.now().minusDays(1),
-                item,
-                booker,
-                BookingStatus.APPROVED
-        ));
+                item, booker, BookingStatus.APPROVED
+        );
+        entityManager.persist(booking);
+        entityManager.flush();
 
         List<BookingDto> result = bookingService.getBookings(booker.getId(), BookingState.PAST);
 
@@ -85,14 +84,14 @@ class BookingServiceImplIntegrationTest {
 
     @Test
     void getOwnerBookings_shouldReturnAllOwnerBookings() {
-        bookingRepository.save(new Booking(
+        Booking booking = new Booking(
                 null,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(3),
-                item,
-                booker,
-                BookingStatus.WAITING
-        ));
+                item, booker, BookingStatus.WAITING
+        );
+        entityManager.persist(booking);
+        entityManager.flush();
 
         List<BookingDto> result = bookingService.getOwnerBookings(owner.getId(), BookingState.ALL);
 
@@ -102,14 +101,14 @@ class BookingServiceImplIntegrationTest {
 
     @Test
     void getOwnerBookings_shouldReturnFutureBookings() {
-        bookingRepository.save(new Booking(
+        Booking booking = new Booking(
                 null,
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(3),
-                item,
-                booker,
-                BookingStatus.APPROVED
-        ));
+                item, booker, BookingStatus.APPROVED
+        );
+        entityManager.persist(booking);
+        entityManager.flush();
 
         List<BookingDto> result = bookingService.getOwnerBookings(owner.getId(), BookingState.FUTURE);
 

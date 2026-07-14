@@ -78,13 +78,4 @@ class ErrorHandlerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").value("Произошла ошибка сервера"));
     }
-
-    @Test
-    void shouldReturn400_whenMethodArgumentNotValid() throws Exception {
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"\",\"email\":\"user@mail.com\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").exists());
-    }
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.baseclienttest;
+package ru.practicum.shareit.client;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.MockRestServiceServer;
-import ru.practicum.shareit.client.ItemRequestClient;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

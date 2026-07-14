@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemDbRepository;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
-import ru.practicum.shareit.request.dto.ItemAnswerDto;
+import ru.practicum.shareit.request.dto.ItemShortDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -71,9 +71,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest request = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос не найден"));
 
-        List<ItemAnswerDto> items = itemRepository.findAllByRequestIdIn(List.of(requestId))
+        List<ItemShortDto> items = itemRepository.findAllByRequestIdIn(List.of(requestId))
                 .stream()
-                .map(item -> new ItemAnswerDto(item.getId(), item.getName(), item.getOwner().getId()))
+                .map(item -> new ItemShortDto(item.getId(), item.getName(), item.getOwner().getId()))
                 .toList();
 
         return ItemRequestMapper.toItemRequestDto(request, items);
@@ -85,10 +85,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<Item> items = itemRepository.findAllByRequestIdIn(requestIds);
 
         return requests.stream().map(request -> {
-            List<ItemAnswerDto> itemAnswers = items.stream()
+            List<ItemShortDto> itemAnswers = items.stream()
                     .filter(item -> item.getRequest() != null &&
                             item.getRequest().getId().equals(request.getId()))
-                    .map(item -> new ItemAnswerDto(
+                    .map(item -> new ItemShortDto(
                             item.getId(),
                             item.getName(),
                             item.getOwner().getId()))
